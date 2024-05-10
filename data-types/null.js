@@ -2,3 +2,19 @@
 let c = null;
 console.log(c); // null
 console.log(typeof(c)); // object - Mặc dù null là primitive type nhưng typeof của null là object
+
+if(null) {
+    console.log("its null");
+}
+
+if(null > 0) {
+    console.log("its null");
+}
+
+if(null >= 0) {
+    console.log("its null");
+}
+
+if(null <= 0) {
+    console.log("its null");
+}

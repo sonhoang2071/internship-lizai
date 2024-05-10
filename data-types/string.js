@@ -1,4 +1,4 @@
-// String : Dùng để biểu diễn giá trị là một xâu các kí tự
+// String : Dùng để biểu diễn giá trị là một mảng các kí tự
 
 // let gr = "Hello World!";
 // let gr2 = `Xin chào!`;
