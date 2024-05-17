@@ -1,5 +1,4 @@
 const fs = require("fs");
-const url = require("url");
 const path = require("path");
 
 // B1: get information from url
@@ -21,10 +20,10 @@ function getUrlInfo(urlString) {
             searchParams: parsedUrl.search || null,
             filename: filename || null,
             extension: extension || null,
-            href: parsedUrl.href || null,
-            origin: parsedUrl.origin || null,
             port: parsedUrl.port || null,
             search: parsedUrl.search || null,
+            href: parsedUrl.href || null,
+            origin: parsedUrl.origin || null,
             hash: parsedUrl.hash || null,
         };
         // return result
@@ -35,9 +34,9 @@ function getUrlInfo(urlString) {
 }
 
 // B2: save info to file json
-function writeUrlInfoToFile(urlInfo, filename) {
+function writeInfoToFile(info, filename) {
     // convert object js to json
-    const data = JSON.stringify(urlInfo, null, 2);
+    const data = JSON.stringify(info, null, 2);
     // write json file
     fs.writeFile(filename, data, "utf-8", (err) => {
         // check error happen
@@ -48,7 +47,7 @@ function writeUrlInfoToFile(urlInfo, filename) {
 }
 
 // B3: read info json file and display
-function readUrlInfoFromFile(filename) {
+function readInfoFromFile(filename) {
     // read json file
     fs.readFile(filename, "utf-8", (err, data) => {
         // check error happen
@@ -56,38 +55,38 @@ function readUrlInfoFromFile(filename) {
             throw Error(err);
         }
         // parse json to object js
-        const urlInfo = JSON.parse(data);
+        const info = JSON.parse(data);
         // display info
-        console.log(urlInfo);
+        console.log(info);
     });
 }
 
 // get url info
 function resolve(url) {
     try {
-        const urlInfo = getUrlInfo(urlString);
+        const info = getUrlInfo(urlString);
         // write file
-        writeUrlInfoToFile(urlInfo, "infos.json");
+        writeInfoToFile(info, "infos.json");
         // read file
-        readUrlInfoFromFile("infos.json");
+        readInfoFromFile("infos.json");
     } catch (error) {
         console.log(error);
     }
 }
 const urlString =
-    "https://www.sonhoang.com:2071/page/info.html?name=son&age=21#salary";
+    "https://www.sonhoang.com:2071/information/index.html?name=son&age=21#salary";
 resolve(urlString);
 // {
 //     protocol: 'https:',
 //     host: 'www.sonhoang.com:2071',
 //     hostname: 'www.sonhoang.com',
-//     pathname: '/page/info.html',
+//     pathname: '/information/index.html',
 //     searchParams: '?name=son&age=21',
-//     filename: 'info.html',
+//     filename: 'index.html',
 //     extension: '.html',
-//     href: 'https://www.sonhoang.com:2071/page/info.html?name=son&age=21#salary',
-//     origin: 'https://www.sonhoang.com:2071',
 //     port: '2071',
 //     search: '?name=son&age=21',
+//     href: 'https://www.sonhoang.com:2071/information/index.html?name=son&age=21#salary',
+//     origin: 'https://www.sonhoang.com:2071',
 //     hash: '#salary'
 // }

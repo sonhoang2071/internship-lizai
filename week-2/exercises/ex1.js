@@ -43,32 +43,47 @@ function getLinks(body, baseUrl) {
     const links = [];
     // using forEach to loop all element
     aLinks.forEach((e) => {
-        // Check an element exists in the links
-        if (!links.includes(e.href)) {
+        // get absolute link
+        let res;
+        // check about:blank or mailto: link
+        if (e.protocol === "about:") {
+            let validUrl = e.hash || "";
+            res = new URL(validUrl, baseUrl);
+        } else if (e.protocol !== "mailto:") {
+            res = new URL(e.href, baseUrl);
+        }
+        // Check an element exists in the links and not undefined
+        if (res !== undefined && !links.includes(res.href)) {
             // push element in links
-            links.push(new URL(e.href, baseUrl));
+            links.push(res.href);
         }
     });
     // using forEach to loop all element
     imgLinks.forEach((e) => {
+        // get absolute link
+        let link = new URL(e.src, baseUrl).href;
         // Check an element exists in the links
-        if (!links.includes(e.src)) {
+        if (!links.includes(link)) {
             // push element in links
-            links.push(new URL(e.src, baseUrl));
+            links.push(link);
         }
     });
     videoLinks.forEach((e) => {
+        // get absolute link
+        let link = new URL(e.src, baseUrl).href;
         // Check an element exists in the links
-        if (!links.includes(e.src)) {
+        if (!links.includes(link)) {
             // push element in links
-            links.push(new URL(e.src, baseUrl));
+            links.push(link);
         }
     });
     audioLinks.forEach((e) => {
+        // get absolute link
+        let link = new URL(e.src, baseUrl).href;
         // Check an element exists in the links
-        if (!links.includes(e.src)) {
+        if (!links.includes(link)) {
             // push element in links
-            links.push(new URL(e.src, baseUrl));
+            links.push(link);
         }
     });
     // return result
@@ -126,16 +141,22 @@ async function getData(url) {
         // html from getLinks()
         const html = getHtml(body);
         // create result object
-        const res = { links: links, text: text, html: html };
+        // const res = { links: links, text: text, html: html };
+        const res = { links: links };
         // return json result
-        return JSON.stringify(res);
+        return res;
+        // return JSON.stringify(res);
     } catch (error) {
         return error;
     }
 }
 
 // defined an url
-const url = "https://anonystick.com";
+const url = "https://sonhoang2071.github.io/my-portfolio/";
 
 // getData and console.log result
-getData(url).then((res) => console.log(res));
+getData(url).then((res) => {
+    console.log(res);
+});
+
+//  console.log(new URL("./assets/linkedin.png", "https://sonhoang2071.github.io/my-portfolio/"));

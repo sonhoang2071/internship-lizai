@@ -2,13 +2,13 @@
   "protocol": "https:",
   "host": "www.sonhoang.com:2071",
   "hostname": "www.sonhoang.com",
-  "pathname": "/page/info.html",
+  "pathname": "/information/index.html",
   "searchParams": "?name=son&age=21",
-  "filename": "info.html",
+  "filename": "index.html",
   "extension": ".html",
-  "href": "https://www.sonhoang.com:2071/page/info.html?name=son&age=21#salary",
-  "origin": "https://www.sonhoang.com:2071",
   "port": "2071",
   "search": "?name=son&age=21",
+  "href": "https://www.sonhoang.com:2071/information/index.html?name=son&age=21#salary",
+  "origin": "https://www.sonhoang.com:2071",
   "hash": "#salary"
 }
