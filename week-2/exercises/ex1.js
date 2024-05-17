@@ -30,11 +30,15 @@ async function fetchData(url) {
 }
 
 //this function to get all links from body
-function getLinks(body) {
+function getLinks(body, baseUrl) {
     // get links of a elements
     const aLinks = body.querySelectorAll("a[href]");
     // get links of img elements
     const imgLinks = body.querySelectorAll("img");
+    // get links of video elements
+    const videoLinks = body.querySelectorAll("video");
+    // get links of audio elements
+    const audioLinks = body.querySelectorAll("audio");
     // init a links to contains all valid links
     const links = [];
     // using forEach to loop all element
@@ -42,7 +46,7 @@ function getLinks(body) {
         // Check an element exists in the links
         if (!links.includes(e.href)) {
             // push element in links
-            links.push(e.href);
+            links.push(new URL(e.href, baseUrl));
         }
     });
     // using forEach to loop all element
@@ -50,7 +54,21 @@ function getLinks(body) {
         // Check an element exists in the links
         if (!links.includes(e.src)) {
             // push element in links
-            links.push(e.src);
+            links.push(new URL(e.src, baseUrl));
+        }
+    });
+    videoLinks.forEach((e) => {
+        // Check an element exists in the links
+        if (!links.includes(e.src)) {
+            // push element in links
+            links.push(new URL(e.src, baseUrl));
+        }
+    });
+    audioLinks.forEach((e) => {
+        // Check an element exists in the links
+        if (!links.includes(e.src)) {
+            // push element in links
+            links.push(new URL(e.src, baseUrl));
         }
     });
     // return result
@@ -102,7 +120,7 @@ async function getData(url) {
             throw Error("body is not Body Object DOM");
         }
         // links from getLinks()
-        const links = getLinks(body);
+        const links = getLinks(body, url);
         // text from getLinks()
         const text = getText(body);
         // html from getLinks()
