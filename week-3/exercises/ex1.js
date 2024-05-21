@@ -2,7 +2,8 @@
 const fs = require("fs");
 const { JSDOM } = require("jsdom");
 // defined an url
-const url = "https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_video";
+const url =
+    "https://anonystick.com/blog-developer/tuyet-voi-connect-pool-gom-96-connects-nhanh-hon-gap-50-lan-so-voi-1000-or-4000-connections-khong-dung-pool-2023060952850932";
 //this function to fetch data from url specified
 async function fetchData(url) {
     // using try catch to handle exception
@@ -15,7 +16,6 @@ async function fetchData(url) {
         // get body object
         const body = dom.window.document.body;
         // return result
-        fs.writeFileSync("link.txt", body.innerHTML, { flag: "a+" });
         return body;
     } catch (error) {
         // if an error occurs -> throw error
