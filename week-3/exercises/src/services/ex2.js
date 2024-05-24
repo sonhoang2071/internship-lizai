@@ -96,7 +96,7 @@ async function resolve(url) {
 
         return info;
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 }
 
