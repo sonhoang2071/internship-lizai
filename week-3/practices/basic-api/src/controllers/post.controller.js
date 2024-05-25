@@ -1,6 +1,7 @@
 const { where } = require("sequelize");
 const Post = require("../models/post.model");
 
+// get all post
 const getPosts = async (req, res, next) => {
     try {
         const posts = await Post.findAll();
@@ -12,10 +13,12 @@ const getPosts = async (req, res, next) => {
         next(error);
     }
 };
+// create a new post
 const createPost = async (req, res, next) => {
     const { title, content } = req.body;
     try {
         const post = await Post.findOne({ where: { title: title } });
+        // check post is existed
         if (post) {
             return res.status(409).json({
                 message: "Title post is existed",
@@ -32,6 +35,7 @@ const createPost = async (req, res, next) => {
     }
 };
 
+// get a post
 const getPost = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -51,6 +55,7 @@ const getPost = async (req, res, next) => {
     }
 };
 
+// update post
 const updatePost = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -58,6 +63,7 @@ const updatePost = async (req, res, next) => {
         const postById = await Post.findOne({ where: { id: id } });
         if (postById) {
             const postByTitle = await Post.findOne({ where: { title: title } });
+            // check title of new post
             if (postByTitle && postByTitle.title !== postById.title) {
                 return res.status(409).json({
                     message: "Title post is existed",
@@ -81,6 +87,7 @@ const updatePost = async (req, res, next) => {
     }
 };
 
+// delete post
 const deletePost = async (req, res, next) => {
     try {
         const { id } = req.params;

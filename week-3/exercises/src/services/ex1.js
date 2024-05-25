@@ -1,8 +1,8 @@
 // import jsdom package to convert js to dom object
 const fs = require("fs");
 const { JSDOM } = require("jsdom");
-//this function to fetch data from url specified
 
+//this function to fetch data from url specified
 async function fetchData(urlString) {
     try {
         // parse url
@@ -14,6 +14,7 @@ async function fetchData(urlString) {
         throw error;
     }
 }
+// this function to check url valid
 function parseUrl(urlString) {
     try {
         // create an URL object from url
@@ -25,6 +26,7 @@ function parseUrl(urlString) {
     }
 }
 
+// get body
 async function getBody(url) {
     // using try catch to handle exception
     try {
@@ -43,6 +45,7 @@ async function getBody(url) {
     }
 }
 
+// check url is existed
 async function urlExists(url) {
     try {
         const response = await fetch(url, { method: "HEAD" });
@@ -52,13 +55,13 @@ async function urlExists(url) {
     }
 }
 
+// filter script element
 function filterScriptTag(links) {
     const newLinks = links.filter(
         (el) => el.tagName.toLowerCase() !== "script"
     );
     return newLinks;
 }
-// factory method to create function filter for a link
 
 // handle link data after filter
 async function handleData(arr, baseUrl, type) {
@@ -89,7 +92,7 @@ async function handleLink(body, baseUrl, type) {
     return result;
 }
 
-// this function to get all require data from url
+// this function to get link
 function getLink(body, url) {
     this.body = body;
     this.url = url;
@@ -148,17 +151,23 @@ function getHtml(body) {
         return html;
     };
 }
+// factory link
 function getLinkFactory() {
+    // factory method
     this.create = function (body, url) {
         return new getLink(body, url);
     };
 }
+// factory text
 function getTextFactory() {
+    // factory method
     this.create = function (body) {
         return new getText(body);
     };
 }
+// factory html
 function getHtmlFactory() {
+    // factory method
     this.create = function (body) {
         return new getHtml(body);
     };
