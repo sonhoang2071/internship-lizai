@@ -2,10 +2,12 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const port = 3000;
-const router = require("./src/routes");
-const db = require("./src/database");
+const routerExercise = require("./exercises/src/routes");
+const routerBasicAPI = require("./practices/basic-api/src/routes");
 
-const Post = require("./src/models/post.model");
+const db = require("./practices/basic-api/src/database");
+
+const Post = require("./practices/basic-api/src/models/post.model");
 db.sync()
     .then((result) => {
         console.log("Database is connected");
@@ -20,7 +22,8 @@ app.use(
     })
 );
 app.get("/", (req, res) => res.send("Hello World!"));
-app.use("/api", router);
+app.use("/exercise", routerExercise);
+app.use("/basic-api", routerBasicAPI);
 
 // handle not found error
 app.use((req, res, next) => {

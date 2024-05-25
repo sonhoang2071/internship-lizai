@@ -42,110 +42,126 @@ async function getBody(url) {
         throw error;
     }
 }
-// filter invalid href link
-function hrefFilter(url) {
+
+async function urlExists(url) {
     try {
-        const protocol = url.protocol;
-        if (
-            protocol === "mailto:" ||
-            protocol === "about:" ||
-            protocol === "javascript:" ||
-            protocol === "data:" ||
-            protocol === "tel:"
-        ) {
-            return false;
-        }
-        return true;
+        const response = await fetch(url, { method: "HEAD" });
+        return response.ok;
     } catch (err) {
         return false;
     }
 }
-// filter invalid src link
-function srcFilter(url) {
-    if (url.tagName == "SCRIPT") {
-        return false;
-    }
-    return true;
+
+function filterScriptTag(links) {
+    const newLinks = links.filter(
+        (el) => el.tagName.toLowerCase() !== "script"
+    );
+    return newLinks;
 }
 // factory method to create function filter for a link
-function factoryLinkFilter(type) {
-    if (type == "src") {
-        return srcFilter;
-    } else if (type == "href") {
-        return hrefFilter;
-    }
-}
+
 // handle link data after filter
-function handleData(arr, baseUrl, type) {
+async function handleData(arr, baseUrl, type) {
     const result = [];
     // loop all elements
-    arr.forEach((e) => {
-        // create absolute link with baseurl
+    for (const e of arr) {
         let tmp = new URL(e[type], baseUrl);
+        console.log(tmp.href);
+        // check url is valid
+        const check = await urlExists(tmp.href);
         // check link is contained in result
-        if (!result.includes(tmp.href)) {
+        if (!result.includes(tmp.href) && check) {
             result.push(tmp.href);
         }
-    });
+    }
     return result;
 }
 // handle link
-function handleLink(body, baseUrl, type) {
-    // using factory method to get a function to filter
-    let fn = factoryLinkFilter(type);
+async function handleLink(body, baseUrl, type) {
     // get links with type and filter them
-    const arr = Array.from(body.querySelectorAll(`[${type}]`)).filter(fn);
+    let arr = Array.from(body.querySelectorAll(`[${type}]`));
+    // using this method to filter script element
+    if (type == "src") {
+        arr = filterScriptTag(arr);
+    }
     // handle array links after filter
-    const result = handleData(arr, baseUrl, type);
+    const result = await handleData(arr, baseUrl, type);
     return result;
 }
 
 // this function to get all require data from url
-function getLinks(body, url) {
-    // using try catch to handle exception
-    try {
-        // links from getLinks()
-        // let get a link with type param
-        let href = handleLink(body, url, "href");
-        let src = handleLink(body, url, "src");
-        return [...href, ...src];
-    } catch (error) {
-        throw error;
-    }
+function getLink(body, url) {
+    this.body = body;
+    this.url = url;
+    this.craw = async function () {
+        // using try catch to handle exception
+        try {
+            // links from getLinks()
+            // let get a link with type param
+            let href = await handleLink(body, url, "href");
+            let src = await handleLink(body, url, "src");
+            return [...href, ...src];
+        } catch (error) {
+            throw error;
+        }
+    };
 }
 //this function to get all text from body
 function getText(body) {
     // init a text to contain all valid text
-    let text = "";
-    // loop all childNodes of body
-    for (let node of body.childNodes) {
-        // check if node have a type equal text node (3) and node have textContent is trimmed equal ""
-        // else node have a type equal element node
-        if (node.nodeType === 3 && node.textContent.trim() != "") {
-            // trim textContent to remove white space at both ends
-            // replaceAll "\n" in text to ""
-            // replace white spaces in text
-            // assign to text variable
-            text +=
-                node.textContent
-                    .trim()
-                    .replaceAll("\n", "")
-                    .replace(/\s+/g, " ") + " ";
-        } else if (node.nodeType === 1) {
-            // call recursion function to handle node
-            text += getText(node);
+    this.body = body;
+    this.craw = function () {
+        let text = "";
+        // loop all childNodes of body
+        for (let node of body.childNodes) {
+            // check if node have a type equal text node (3) and node have textContent is trimmed equal ""
+            // else node have a type equal element node
+
+            if (node.nodeType === 3 && node.textContent.trim() != "") {
+                // trim textContent to remove white space at both ends
+                // replaceAll "\n" in text to ""
+                // replace white spaces in text
+                // assign to text variable
+                text +=
+                    node.textContent
+                        .trim()
+                        .replaceAll("\n", "")
+                        .replace(/\s+/g, " ") + " ";
+            } else if (node.nodeType === 1) {
+                // call recursion function to handle node
+                text += new getText(node).craw();
+            }
         }
-    }
-    // return result
-    return text;
+        // return result
+
+        return text;
+    };
 }
 
 // this function to get html from body
 function getHtml(body) {
-    // using innerHTML to get html from body
-    const html = body.innerHTML;
-    // return result
-    return html;
+    this.body = body;
+    this.craw = function () {
+        // using innerHTML to get html from body
+        const html = body.innerHTML;
+        // return result
+        return html;
+    };
+}
+function getLinkFactory() {
+    this.create = function (body, url) {
+        return new getLink(body, url);
+    };
+}
+function getTextFactory() {
+    this.create = function (body) {
+        return new getText(body);
+    };
+}
+function getHtmlFactory() {
+    this.create = function (body) {
+        return new getHtml(body);
+    };
 }
 async function crawData(url) {
     // using try catch to handle exception
@@ -154,11 +170,11 @@ async function crawData(url) {
         const body = await getBody(url);
         // links from getLinks()
         // let get a link with type param
-        let links = getLinks(body, url);
+        let links = await new getLinkFactory().create(body, url).craw();
         // get text from getText()
-        let text = getText(body);
+        let text = new getTextFactory().create(body).craw();
         // get html from getHtml()
-        let html = getHtml(body);
+        let html = new getHtmlFactory().create(body).craw();
 
         return { links: links, text: text, html: html };
     } catch (error) {

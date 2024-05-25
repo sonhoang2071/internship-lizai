@@ -1,13 +1,11 @@
 {
   "protocol": "https:",
-  "host": "www.w3schools.com",
-  "hostname": "www.w3schools.com",
-  "pathname": "/html/mov_bbb.mp4",
+  "host": "anonystick.com",
+  "hostname": "anonystick.com",
+  "pathname": "/",
   "port": null,
   "search": null,
-  "href": "https://www.w3schools.com/html/mov_bbb.mp4",
-  "origin": "https://www.w3schools.com",
-  "hash": null,
-  "filename": "mov_bbb.mp4",
-  "extension": ".mp4"
+  "href": "https://anonystick.com/",
+  "origin": "https://anonystick.com",
+  "hash": null
 }

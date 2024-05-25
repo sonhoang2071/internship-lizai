@@ -2,34 +2,44 @@ const fs = require("fs");
 const path = require("path");
 
 // B1: get information from url
-async function getUrlInfo(urlString) {
-    // create URL obj from url string
-    try {
-        const parsedUrl = new URL(urlString);
-        // get path name to get filename and ext
-        const pathname = parsedUrl.pathname;
-        // get info from url
-        const urlInfo = {
-            protocol: parsedUrl.protocol || null,
-            host: parsedUrl.host || null,
-            hostname: parsedUrl.hostname || null,
-            pathname: pathname || null,
-            port: parsedUrl.port || null,
-            search: parsedUrl.search || null,
-            href: parsedUrl.href || null,
-            origin: parsedUrl.origin || null,
-            hash: parsedUrl.hash || null,
-        };
-        // check content-type of url
-        await checkContentType(parsedUrl, urlInfo);
+function urlInfo(urlString) {
+    this.urlString = urlString;
+    this.get = async function () {
+        // create URL obj from url string
+        try {
+            const parsedUrl = new URL(urlString);
+            // get path name to get filename and ext
+            const pathname = parsedUrl.pathname;
+            // get info from url
+            const urlInfo = {
+                protocol: parsedUrl.protocol || null,
+                host: parsedUrl.host || null,
+                hostname: parsedUrl.hostname || null,
+                pathname: pathname || null,
+                port: parsedUrl.port || null,
+                search: parsedUrl.search || null,
+                href: parsedUrl.href || null,
+                origin: parsedUrl.origin || null,
+                hash: parsedUrl.hash || null,
+            };
+            // check content-type of url
+            await checkContentType(parsedUrl, urlInfo);
 
-        // get search params of url
-        getSearchParams(parsedUrl, urlInfo);
-        // return result
-        return urlInfo;
-    } catch (error) {
-        throw Error(error);
-    }
+            // get search params of url
+            getSearchParams(parsedUrl, urlInfo);
+            // return result
+            return urlInfo;
+        } catch (error) {
+            throw Error(error);
+        }
+    };
+}
+// class factory
+function urlInfoFactory() {
+    // factory method
+    this.create = function (urlString) {
+        return new urlInfo(urlString);
+    };
 }
 
 async function checkContentType(url, urlInfo) {
@@ -62,7 +72,7 @@ function writeInfoToFile(info, filename) {
     // convert object js to json
     const data = JSON.stringify(info, null, 2);
     // write json file
-    fs.writeFile(filename, data, "utf-8", (err) => {
+    fs.writeFile(filename, data, (err) => {
         // check error happen
         if (err) {
             throw Error(err);
@@ -88,12 +98,11 @@ function readInfoFromFile(filename) {
 // get url info
 async function resolve(url) {
     try {
-        const info = await getUrlInfo(url);
+        const info = await new urlInfoFactory().create(url).get();
         // write file
-        writeInfoToFile(info, "infos.json");
+        writeInfoToFile(info, "exercises/infos.json");
         // read file
-        readInfoFromFile("infos.json");
-
+        readInfoFromFile("exercises/infos.json");
         return info;
     } catch (error) {
         throw error;
