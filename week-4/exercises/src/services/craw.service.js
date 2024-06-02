@@ -18,20 +18,22 @@ async function crawlUrlFromSearchUrl(url) {
     await page.waitForNavigation();
 
     const startTime = Date.now();
-    const timeLimit = 1000 * 60 * 5; // 5 minutes in milliseconds
+    const timeLimit = 500; // 5 minutes in milliseconds
     let currentPage = 0;
     let urls = [];
 
     while (Date.now() - startTime < timeLimit) {
-        // Check if there is a next page
+        // lấy trang tiếp theo
         const nextPageExists = (await page.$('a[rel="next"]')) !== null;
-        const newUrls = await page.$$eval("a[href]", (links) =>
+        // lấy ra các link của bài viết
+        const newUrls = await page.$$eval("div.view-content a[href]", (links) =>
             links.map((link) => link.href)
         );
 
         urls = urls.concat(newUrls);
+        // kiểm tra trang tiếp theo
         if (nextPageExists) {
-            // Go to the next page
+            // đi dến trang tiếp theo
             await Promise.all([
                 page.click('a[rel="next"]'),
                 page.waitForNavigation(),
@@ -65,7 +67,7 @@ const verifyUrl = async (url) => {
     try {
         await page.goto(url, {
             waitUntil: "load",
-            timeout: 2000,
+            timeout: 5000,
         });
         await browser.close();
         return true;
@@ -89,13 +91,18 @@ async function crawlInfoOfUrl(urlId) {
     });
     const page = await browser.newPage();
     await page.goto(urlId);
+    // lấy title
     const title = await page.title();
+    // lấy description
     const description = await page
         .$eval('meta[name="description"]', (element) => element.content)
         .catch(() => null);
+    // lấy html
     const html = await page.evaluate(() => document.body.innerHTML);
+    // lấy text
     const text = await page.evaluate(() => document.body.innerText);
-    const crawlUrl = await page.$$eval("a[href]", (links) =>
+    // lấy các url con của bài viết
+    const crawlUrl = await page.$$eval("#main-content a[href]", (links) =>
         links.map((link) => link.href)
     );
     await browser.close();
@@ -149,7 +156,6 @@ async function checkUrlCrawled(urls) {
     });
     return { urlIsCrawled, urlUnCrawled };
 }
-
 
 module.exports = {
     crawlUrlFromSearchUrl,

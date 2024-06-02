@@ -6,8 +6,15 @@ async function create(taskId, searchUrl) {
     return response.affectedRows;
 }
 
+async function existed(taskId) {
+    const sql = `SELECT task_id FROM task WHERE task_id = '${taskId}'`;
+    const response = await db.query(sql);
+    return response.length > 0;
+}
+
 module.exports = {
     create,
+    existed
 };
 
 
