@@ -1,0 +1,81 @@
+version: "3.8"
+networks:
+    db-service-api:
+services:
+    api:
+        build:
+            context: ./api
+            dockerfile: Dockerfile
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./api:/usr/src/app
+        depends_on:
+            - db
+        environment:
+            DB_HOST: db
+            DB_USER: root
+            DB_PASSWORD: password
+            DB_NAME: crawl
+        networks:
+            - db-service-api
+
+    service-1:
+        build:
+            context: ./services/1
+            dockerfile: Dockerfile
+        ports:
+            - "3001:3001"
+        depends_on:
+            - db
+        networks:
+            - db-service-api
+
+    service-2:
+        build:
+            context: ./services/1
+            dockerfile: Dockerfile
+        ports:
+            - "3002:3002"
+        depends_on:
+            - db
+        networks:
+            - db-service-api
+
+    service-3:
+        build:
+            context: ./services/1
+            dockerfile: Dockerfile
+        ports:
+            - "3003:3003"
+        depends_on:
+            - db
+        networks:
+            - db-service-api
+
+    service-4:
+        build:
+            context: ./services/1
+            dockerfile: Dockerfile
+        ports:
+            - "3004:3004"
+        depends_on:
+            - db
+        networks:
+            - db-service-api
+        environment:
+            DB_HOST: db
+            DB_USER: root
+            DB_PASSWORD: password
+            DB_NAME: crawl
+
+    db:
+        image: mysql:8.0
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+        volumes:
+            - ./database/crawl.sql:/docker-entrypoint-initdb.d/database.sql
+        networks:
+            - db-service-api
