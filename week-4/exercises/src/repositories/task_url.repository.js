@@ -13,7 +13,11 @@ async function getAllUrlsByTaskId(params, limit) {
     } else {
         sql = `SELECT url.url_id, url.is_crawled from task_url INNER JOIN url ON task_url.url_id = url.url_id WHERE task_id = ?`;
     }
-    const response = await db.query(sql, [params]);
+
+
+    const response =
+
+        await db.query(sql, [params]);
     return response;
 }
 

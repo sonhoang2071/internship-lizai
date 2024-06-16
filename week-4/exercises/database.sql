@@ -1,6 +1,6 @@
-CREATE DATABASE crawl;
+CREATE DATABASE sonhoang;
 
-USE crawl;
+USE sonhoang;
 
 CREATE TABLE `task`(
     `task_id` VARCHAR(255) NOT NULL  PRIMARY KEY,

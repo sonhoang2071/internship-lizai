@@ -1,0 +1,104 @@
+version: "3.8"
+
+networks:
+    db-service-api:
+
+services:
+
+    rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        networks:
+            - db-service-api
+
+    service-a:
+        image: node-service-a
+        build:
+            context: ./services/a
+            dockerfile: Dockerfile
+        ports:
+            - "3001:3001"
+        networks:
+            - db-service-api
+        depends_on:
+            - db
+            - rabbitmq
+
+    service-b:
+        image: node-service-b
+        build:
+            context: ./services/b
+            dockerfile: Dockerfile
+        ports:
+            - "3002:3002"
+        networks:
+            - db-service-api
+        depends_on:
+            - db
+            - rabbitmq
+
+    service-c:
+        image: node-service-c
+        build:
+            context: ./services/c
+            dockerfile: Dockerfile
+        ports:
+            - "3003:3003"
+        networks:
+            - db-service-api
+        depends_on:
+            - db
+            - rabbitmq
+        deploy:
+            replicas: 10
+
+    service-d:
+        image: node-service-d
+        build:
+            context: ./services/d
+            dockerfile: Dockerfile
+        ports:
+            - "3004:3004"
+        environment:
+            DB_HOST: db
+            DB_USER: root
+            DB_PASSWORD: password
+            DB_NAME: crawl
+        depends_on:
+            - db
+            - rabbitmq
+        networks:
+            - db-service-api
+        deploy:
+            replicas: 10
+
+    api:
+        image: node-api
+        build:
+            context: api
+            dockerfile: Dockerfile
+        ports:
+            - "3000:3000"
+        environment:
+            DB_HOST: db
+            DB_USER: root
+            DB_PASSWORD: password
+            DB_NAME: crawl
+        depends_on:
+            - db
+            - rabbitmq
+        networks:
+            - db-service-api
+
+    db:
+        image: mysql:8.0
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+        volumes:
+            - ./database/crawl.sql:/docker-entrypoint-initdb.d/database.sql
+        networks:
+            - db-service-api

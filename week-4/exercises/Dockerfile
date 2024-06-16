@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Mở cổng ứng dụng
-EXPOSE 3000
+EXPOSE 3001
 
 # Chạy ứng dụng
 CMD ["node", "app.js"]
