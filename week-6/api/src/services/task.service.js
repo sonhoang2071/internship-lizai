@@ -21,6 +21,10 @@ class TaskService {
     }
 
     static async restart(taskId) {
+        await ElasticsearchService.updateStatusTask(taskId, "running");
+
+        const res = await TaskRepository.updateStatus(taskId, "running");
+
         amqp.connect(connectUrl, async (error0, connection) => {
             if (error0) {
                 throw error0;
@@ -40,46 +44,33 @@ class TaskService {
                 const messagesToRequeue = [];
                 const messagesToTemp = [];
 
-                await channel.consume(stopQueue, (msg) => {
+                const _taskId = taskId;
+
+                await channel.consume(stopQueue, async(msg) => {
                     if (msg !== null) {
                         const messageContent = JSON.parse(msg.content.toString());
-                        if (messageContent.taskId === taskId) {
-                            messagesToRequeue.push(messageContent);
+                        console.log(_taskId);
+                        if (messageContent.taskId === _taskId) {
+                            await channel.sendToQueue(sendQueue, Buffer.from(JSON.stringify(messageContent)));
                         } else {
-                            messagesToTemp.push(messageContent);
+                            await channel.sendToQueue(tempQueue, Buffer.from(JSON.stringify(messageContent)));
                         }
                         channel.ack(msg);
                     }
                 }, { noAck: false });
 
-                for (const message of messagesToRequeue) {
-                    await channel.sendToQueue(sendQueue, Buffer.from(JSON.stringify(message)), { persistent: true });
-                }
-
-                for (const message of messagesToTemp) {
-                    await channel.sendToQueue(tempQueue, Buffer.from(JSON.stringify(message)), { persistent: true });
-                }
-
                 // Move messages from temporary queue back to stop queue
                 await channel.consume(tempQueue, (msg) => {
                     if (msg !== null) {
-                        channel.sendToQueue(stopQueue, Buffer.from(msg.content), { persistent: true });
+                        channel.sendToQueue(stopQueue, Buffer.from(msg.content));
                         channel.ack(msg);
                     }
                 }, { noAck: false });
-
-
 
             } catch (error) {
                 console.log(error);
                 throw error;
             }
-
-            setTimeout(() => {
-                connection.close();
-                process.exit(0);
-            }, 500);
-
         });
     }
 

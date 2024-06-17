@@ -28,14 +28,12 @@ amqp.connect(connectUrl, async (error0, connection) => {
         await channel.assertQueue(stopQueue, { durable: false });
 
 
-        // Nhận tin nhắn từ hàng đợi "sites"
+
         channel.consume(receiveQueue, async (msg) => {
             if (msg !== null) {
                 let messageObj = JSON.parse(msg.content.toString());
 
-                // console.log(`[x] Sent `);
-                // console.log(messageObj);
-                console.log(messageObj);
+
                 if(! await ElasticsearchService.checkTaskDeleted(messageObj.taskId)) {
                     if(await ElasticsearchService.checkTaskRunning(messageObj.taskId)) {
 
@@ -80,10 +78,9 @@ amqp.connect(connectUrl, async (error0, connection) => {
                     } else {
                         await channel.sendToQueue(stopQueue, Buffer.from(JSON.stringify(messageObj)));
                     }
-                    channel.ack(msg);
-                } else {
-                    channel.ack(msg);
                 }
+                channel.ack(msg);
+
             }
         }, { noAck: false });
 

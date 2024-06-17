@@ -13,6 +13,17 @@ services:
         networks:
             - db-service-api
 
+    db:
+        image: mysql:8.0
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: password
+        volumes:
+            - ./database/crawl.sql:/docker-entrypoint-initdb.d/database.sql
+        networks:
+            - db-service-api
+
     service-a:
         image: node-service-a
         build:
@@ -92,13 +103,3 @@ services:
         networks:
             - db-service-api
 
-    db:
-        image: mysql:8.0
-        ports:
-            - "3307:3306"
-        environment:
-            MYSQL_ROOT_PASSWORD: password
-        volumes:
-            - ./database/crawl.sql:/docker-entrypoint-initdb.d/database.sql
-        networks:
-            - db-service-api

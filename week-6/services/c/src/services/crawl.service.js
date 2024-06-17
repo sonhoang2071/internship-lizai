@@ -47,8 +47,6 @@ class CrawlService {
         }
         catch(e) {
             await browser.close();
-            console.log(obj.urlCrawled.urlString);
-            console.log(e);
             return false
         }
 

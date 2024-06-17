@@ -1,7 +1,7 @@
 const amqp = require('amqplib/callback_api');
 
 const sendQueue = "sites";
-const connectUrl = "amqp://172.23.204.207:5672";
+const connectUrl = "amqp://rabbitmq";
 
 const ElasticsearchService = require("./src/services/elasticsearch.service")
 const TaskRepository = require("./src/repositories/task.repository");
@@ -46,8 +46,10 @@ amqp.connect(connectUrl, async (error0, connection) => {
 
 
         for(const message of messages) {
-            await ElasticsearchService.createTask(message.taskId, "running");
             await TaskRepository.create(message.taskId, message.searchUrl, message.keyword);
+
+            await ElasticsearchService.createTask(message.taskId, "running");
+
             await channel.sendToQueue(sendQueue, Buffer.from(JSON.stringify(message)));
             console.log(` [x] Sent '${message}'`);
         }
@@ -56,10 +58,4 @@ amqp.connect(connectUrl, async (error0, connection) => {
         throw e;
     }
 
-
-    // Đóng kết nối sau 500ms để đảm bảo tất cả tin nhắn đã được gửi
-    setTimeout(() => {
-        connection.close();
-        process.exit(0);
-    }, 500);
 });

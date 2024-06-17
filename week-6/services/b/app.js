@@ -3,7 +3,7 @@ const amqp = require('amqplib/callback_api');
 const receiveQueue = 'sites';
 const sendQueue = "urls";
 const stopQueue = "stop";
-const connectUrl = "amqp://172.23.204.207:5672/";
+const connectUrl = "amqp://rabbitmq";
 
 const CrawlService = require("./src/services/crawl.service");
 const ElasticsearchService = require("./src/services/elasticsearch.service");
