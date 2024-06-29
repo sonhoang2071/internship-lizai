@@ -66,6 +66,11 @@ class ElasticsearchService {
             console.error('Error updating task status:', error);
         }
     }
+    static async checkTaskDeleted(taskId) {
+        const response = await ElasticsearchService.findTask(taskId);
+        const task = response[0]._source;
+        return task.status === "delete" ? true : false;
+    }
 }
 
 module.exports = ElasticsearchService;

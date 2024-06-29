@@ -61,7 +61,7 @@ class ElasticsearchService {
     static async checkTaskDeleted(taskId) {
         const response = await ElasticsearchService.findTask(taskId);
         const task = response[0]._source;
-        return task.status === "deleted" ? true : false;
+        return task.status === "delete" ? true : false;
     }
 
     static async findTask(taskId) {

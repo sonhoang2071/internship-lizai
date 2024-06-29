@@ -60,9 +60,13 @@ class TaskService {
                 }, { noAck: false });
 
                 // Move messages from temporary queue back to stop queue
-                await channel.consume(tempQueue, (msg) => {
+                await channel.consume(tempQueue, async(msg) => {
                     if (msg !== null) {
-                        channel.sendToQueue(stopQueue, Buffer.from(msg.content));
+                        const messageContent = JSON.parse(msg.content.toString());
+                        if(! await ElasticsearchService.checkTaskDeleted(messageContent.taskId))
+                        {
+                            channel.sendToQueue(stopQueue, Buffer.from(msg.content));
+                        }
                         channel.ack(msg);
                     }
                 }, { noAck: false });

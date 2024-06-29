@@ -115,9 +115,9 @@ class CrawlTask2 {
             const currentURL = await page.url();
 
             // Thêm hoặc thay đổi query parameters
+
             const urlObj = new URL(currentURL);
             urlObj.searchParams.set('start', `${lastPage*10}`);
-
             const newURL = urlObj.toString();
 
 
